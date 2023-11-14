@@ -18,13 +18,19 @@ let config = {
 	idColumn: 'id',
 	dataColumn: 'data',
 	timestampColumn: 'edited_at',
+	versionColumn: 'version',
+
+	throttle: false, // Disable throttling in tests
 
 	// Base settings passed when we init Reactive()
 	baseReactive() { return {
 		supabase: config.supabase,
 		table: config.table,
 		idColumn: config.idColumn,
-		throttle: false,
+		dataColumn: config.dataColumn,
+		timestampColumn: config.timestampColumn,
+		versionColumn: config.versionColumn,
+		throttle: config.throttle,
 		debug(...msg) {
 			mlog.log(`[SUPABASE/${this.table}/${this.id}]`, ...msg);
 		},
@@ -61,15 +67,18 @@ export async function reset() {
 		.insert([
 			{
 				[config.idColumn]: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+				[config.versionColumn]: 0,
 			},
 			{
 				[config.idColumn]: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+				[config.versionColumn]: 0,
 				[config.dataColumn]: {
 					existingKey: 'bbb',
 				}
 			},
 			{
 				[config.idColumn]: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+				[config.versionColumn]: 0,
 				[config.dataColumn]: {
 					existingArray: [1, 2, {three: 3}],
 				}

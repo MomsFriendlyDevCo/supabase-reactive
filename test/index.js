@@ -1,5 +1,7 @@
 import config from './config.js';
 import {expect} from 'chai';
+import mlog from 'mocha-logger';
+import {random} from 'lodash-es';
 import Reactive, {defaults as ReactiveDefaults} from '#lib/reactive';
 
 describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
@@ -37,8 +39,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			write: false,
 		});
 		expect(fetchedA).to.be.an('object');
-		expect(fetchedA).to.have.property('$id', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
-		expect(fetchedA).to.have.property('$timestamp');
+		expect(fetchedA).to.have.nested.property('$meta.id', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+		expect(fetchedA).to.have.nested.property('$meta.timestamp');
 		expect(fetchedA).to.deep.equal({});
 	});
 
@@ -49,8 +51,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			write: false,
 		})
 		expect(fetchedB).to.be.an('object');
-		expect(fetchedB).to.have.property('$id', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
-		expect(fetchedB).to.have.property('$timestamp');
+		expect(fetchedB).to.have.nested.property('$meta.id', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
+		expect(fetchedB).to.have.nested.property('$meta.timestamp');
 		expect(fetchedB).to.be.deep.equal({
 			existingKey: 'bbb',
 		});
@@ -61,16 +63,14 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		let fetchedC = await Reactive(`${config.table}/cccccccc-cccc-cccc-cccc-cccccccccccc`);
 		expect(fetchedC).to.be.an('object');
-		expect(fetchedC).to.have.property('$id', 'cccccccc-cccc-cccc-cccc-cccccccccccc');
-		expect(fetchedC).to.have.property('$timestamp');
+		expect(fetchedC).to.have.nested.property('$meta.id', 'cccccccc-cccc-cccc-cccc-cccccccccccc');
+		expect(fetchedC).to.have.nested.property('$meta.timestamp');
 		expect(fetchedC).to.be.deep.equal({
 			existingArray: [1, 2, {three: 3}],
 		});
 	});
 
 	it('react to lifecycle', async ()=> {
-		Object.assign(ReactiveDefaults, config.baseReactive());
-
 		let tripped = {
 			init: 0,
 			read: 0,
@@ -79,6 +79,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		};
 
 		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
+			...config.baseReactive(),
 			onInit: ()=> tripped.init++,
 			onRead: ()=> tripped.read++,
 			onChange: ()=> tripped.change++,
@@ -86,6 +87,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		});
 
 		// Check that init has registered
+		expect(state.$meta.version).to.equal(0);
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
@@ -99,6 +101,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		// Flush to server + check stats
 		await state.$flush();
+		//expect(state.$meta.version).to.equal(1);
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
@@ -108,6 +111,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		// Read back + check stats
 		await state.$read();
+		//expect(state.$meta.version).to.equal(1);
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
