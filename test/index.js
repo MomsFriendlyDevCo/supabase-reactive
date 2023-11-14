@@ -9,7 +9,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 	it('basic state checking (purely offline)', ()=> {
 		let state = Reactive({
-			...config.reactive(),
+			...config.baseReactiveOptions,
 
 			// Purely offline state options
 			read: false,

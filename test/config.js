@@ -1,7 +1,10 @@
 import {createClient as Supabase} from '@supabase/supabase-js'
 
+/**
+* Base config for tests
+* @type {Object}
+*/
 let config = {
-	// Base config for tests
 	supabaseUrl: 'FIXME',
 	supabaseKey: 'FIXME',
 	supabaseOptions: {
@@ -10,20 +13,42 @@ let config = {
 		},
 	},
 
-	// Test utility functions
-	setup() {
-		// config.supabase = Supabase(config.supabaseUrl, config.supabaseKey, config.supabaseOptions);
-	},
 
-	teardown() {
-	},
-
-	reactive() {
-		return {
-			supabase: config.supabase,
-			table: config.table,
-			idColumn: config.idColumn,
-		};
-	},
 }
-export default config;
+
+
+/**
+* Create `config.supabase` instance + call reset()
+* @returns {Promise} A promise which resolves when the operation has completed
+*/
+export function setup() {
+	config.supabase = Supabase(config.supabaseUrl, config.supabaseKey, config.supabaseOptions);
+}
+
+
+/**
+* Reset database / table state
+*/
+export function reset() {
+}
+
+
+/**
+* Release all open handles + prepare for shutdown
+*/
+export function teardown() {
+}
+
+
+export default {
+	...config,
+
+	baseReactiveSettings: {
+		supabase: config.supabase,
+		table: config.table,
+		idColumn: config.idColumn,
+	},
+
+	// Test utility functions
+	setup, reset, teardown,
+}
