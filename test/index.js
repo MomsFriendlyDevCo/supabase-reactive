@@ -68,26 +68,29 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		});
 	});
 
-	it('react to read/write cycle', async ()=> {
+	it('react to lifecycle', async ()=> {
 		Object.assign(ReactiveDefaults, config.baseReactive());
 
 		let tripped = {
 			init: 0,
 			read: 0,
-			localChange: 0,
+			change: 0,
+			destroy: 0,
 		};
 
 		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
 			onInit: ()=> tripped.init++,
 			onRead: ()=> tripped.read++,
-			onLocalChange: ()=> tripped.localChange++,
+			onChange: ()=> tripped.change++,
+			onDestroy: ()=> tripped.destroy++,
 		});
 		state.foo = 'Foo!';
 
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
-			localChange: 0,
+			change: 0,
+			destroy: 0,
 		})
 		expect(state).to.deep.equal({foo: 'Foo!'});
 
@@ -96,7 +99,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
-			localChange: 1,
+			change: 1,
+			destroy: 0,
 		})
 
 		// Read back + check stats
@@ -104,7 +108,16 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
-			localChange: 1,
+			change: 1,
+			destroy: 0,
+		})
+
+		await state.$destroy();
+		expect(tripped).to.be.deep.equal({
+			init: 1,
+			read: 1,
+			change: 1,
+			destroy: 1,
 		})
 	});
 
