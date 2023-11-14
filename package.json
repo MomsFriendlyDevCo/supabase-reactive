@@ -1,0 +1,55 @@
+{
+  "name": "@momsfriendlydevco/supabase-reactive",
+  "version": "1.0.0",
+  "description": "Supbase plugin for reactive read/write against local objects",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "mocha"
+  },
+  "keywords": [
+    "supabase",
+    "reactive"
+  ],
+  "type": "module",
+  "imports": {
+    "#lib/*": "./lib/*.js"
+  },
+  "exports": {
+    ".": "./lib/reactive.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MomsFriendlyDevCo/supabase-reactive.git"
+  },
+  "author": "Matt Carter <matt@mfdc.biz>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MomsFriendlyDevCo/supabase-reactive/issues"
+  },
+  "homepage": "https://github.com/MomsFriendlyDevCo/supabase-reactive#readme",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "dependencies": {
+    "@momsfriendlydevco/eslint-config": "^1.0.9",
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.28.0",
+    "mocha": "^10.1.0"
+  },
+  "eslintConfig": {
+    "extends": "@momsfriendlydevco",
+    "env": {
+      "es6": true,
+      "node": true,
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 13,
+      "sourceType": "module"
+    }
+  }
+}
