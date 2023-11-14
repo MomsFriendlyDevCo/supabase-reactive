@@ -68,4 +68,44 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		});
 	});
 
+	it('react to read/write cycle', async ()=> {
+		Object.assign(ReactiveDefaults, config.baseReactive());
+
+		let tripped = {
+			init: 0,
+			read: 0,
+			localChange: 0,
+		};
+
+		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
+			onInit: ()=> tripped.init++,
+			onRead: ()=> tripped.read++,
+			onLocalChange: ()=> tripped.localChange++,
+		});
+		state.foo = 'Foo!';
+
+		expect(tripped).to.be.deep.equal({
+			init: 1,
+			read: 0,
+			localChange: 0,
+		})
+		expect(state).to.deep.equal({foo: 'Foo!'});
+
+		// Flush to server + check stats
+		await state.$flush();
+		expect(tripped).to.be.deep.equal({
+			init: 1,
+			read: 0,
+			localChange: 1,
+		})
+
+		// Read back + check stats
+		await state.$read();
+		expect(tripped).to.be.deep.equal({
+			init: 1,
+			read: 1,
+			localChange: 1,
+		})
+	});
+
 });

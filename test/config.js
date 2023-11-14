@@ -24,6 +24,7 @@ let config = {
 		supabase: config.supabase,
 		table: config.table,
 		idColumn: config.idColumn,
+		throttle: false,
 		debug(...msg) {
 			mlog.log(`[SUPABASE/${this.table}/${this.id}]`, ...msg);
 		},
