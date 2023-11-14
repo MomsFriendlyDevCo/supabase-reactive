@@ -1,7 +1,7 @@
 {
   "name": "@momsfriendlydevco/supabase-reactive",
   "version": "1.0.0",
-  "description": "Supbase plugin for reactive read/write against local objects",
+  "description": "Supabase plugin for reactive read/write against local objects",
   "scripts": {
     "lint": "eslint .",
     "test": "mocha"
