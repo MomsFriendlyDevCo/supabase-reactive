@@ -84,14 +84,17 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			onChange: ()=> tripped.change++,
 			onDestroy: ()=> tripped.destroy++,
 		});
-		state.foo = 'Foo!';
 
+		// Check that init has registered
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
 			change: 0,
 			destroy: 0,
-		})
+		});
+
+		// Write local key
+		state.foo = 'Foo!';
 		expect(state).to.deep.equal({foo: 'Foo!'});
 
 		// Flush to server + check stats
@@ -101,7 +104,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			read: 0,
 			change: 1,
 			destroy: 0,
-		})
+		});
 
 		// Read back + check stats
 		await state.$read();
@@ -112,6 +115,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			destroy: 0,
 		})
 
+		// Trigger destroy + check state
 		await state.$destroy();
 		expect(tripped).to.be.deep.equal({
 			init: 1,
