@@ -81,7 +81,8 @@ export async function reset() {
 /**
 * Release all open handles + prepare for shutdown
 */
-export function teardown() {
+export async function teardown() {
+	await config.supabase.removeAllChannels();
 }
 
 
