@@ -101,7 +101,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		// Flush to server + check stats
 		await state.$flush();
-		//expect(state.$meta.version).to.equal(1);
+		// expect(state.$meta.version).to.equal(1);
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 0,
@@ -111,7 +111,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		// Read back + check stats
 		await state.$read();
-		//expect(state.$meta.version).to.equal(1);
+		// expect(state.$meta.version).to.equal(1);
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
@@ -127,6 +127,74 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			change: 1,
 			destroy: 1,
 		})
+	});
+
+	it.only('deeply nested state read/write change detection + sync', async function () {
+		this.timeout(30 * 1000); //~ 30s timeout
+
+		let buildRandomBranch = (depth = 0) => {
+			let dice = // Roll a dice to pick the content
+				depth == 0 ? 10 // first roll is always '10'
+				: random(0, 11 - depth, false); // Subsequent rolls bias downwards based on depth (to avoid recursion)
+
+			return (
+				dice == 0 ? false
+				: dice == 1 ? true
+				: dice == 2 ? random(1, 10000)
+				: dice == 3 ? new Date(random(1000000000000, 1777777777777))
+				: dice == 5 ? Array.from(new Array(random(1, 10)), ()=> random(1, 10))
+				: dice == 6 ? null
+				: dice < 8 ? Array.from(new Array(random(1, 10)), ()=> buildRandomBranch(depth+1))
+				: Object.fromEntries(
+					Array.from(new Array(random(1, 5)))
+						.map((v, k) => [
+							`key_${k}`,
+							buildRandomBranch(depth+1),
+						])
+				)
+			)
+		}
+
+		let state = await Reactive(`${config.table}/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb`, {
+			...config.baseReactive(),
+		});
+
+		for (let i = 1; i < 6; i++) {
+			mlog.log('Iteration', i);
+
+			// Propose new structure
+			let struct = {
+				...state,
+				...buildRandomBranch(),
+			};
+
+			// Assign proposed structure to state - expect watcher to pick this up
+			Object.assign(state, struct);
+
+			// Check local state has updated against the proposed one
+			expect(state).to.be.deep.equal(struct);
+
+			// Await server flush
+			await state.$flush();
+
+			// Force-fetch server version and compare to local
+			let serverSnapshot = await state.$fetch();
+			console.log('3Way compare', {
+				state: Object.keys(state).sort(),
+				struct: Object.keys(struct).sort(),
+				serverSnapshot: Object.keys(serverSnapshot).sort(),
+			});
+			// expect(state).to.deep.equal(serverSnapshot);
+
+			// Randomly nuke keys
+			/*
+			Object.keys(state).slice(0, random(0, 3))
+				.forEach(key => {
+					delete state[key];
+					delete struct[key];
+				});
+			*/
+		}
 	});
 
 });
