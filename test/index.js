@@ -33,8 +33,8 @@ function buildRandomBranch(depth = 0) {
 
 describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
-	before('supabase setup', config.setup)
-	after('supabase teardown', config.teardown)
+	before('supabase setup', config.setup);
+	after('supabase teardown', config.teardown);
 
 	it('basic state checking (purely offline)', async ()=> {
 		let state = await Reactive({
@@ -56,6 +56,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			foo: 'Foo!',
 			bar: 'Bar!',
 		});
+
+		await state.$destroy();
 	});
 
 	it('access an existing row (via settings)', async ()=> {
@@ -69,6 +71,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(fetchedA).to.have.nested.property('$meta.id', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
 		expect(fetchedA).to.have.nested.property('$meta.timestamp');
 		expect(fetchedA).to.deep.equal({});
+
+		await fetchedA.$destroy();
 	});
 
 	it('access existing rows (via path + options)', async ()=> {
@@ -83,6 +87,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(fetchedB).to.be.deep.equal({
 			existingKey: 'bbb',
 		});
+
+		await fetchedB.$destroy();
 	});
 
 	it('access existing rows (via path + defaults)', async ()=> {
@@ -95,6 +101,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(fetchedC).to.be.deep.equal({
 			existingArray: [1, 2, {three: 3}],
 		});
+
+		await fetchedC.$destroy();
 	});
 
 	it('react to lifecycle', async ()=> {
@@ -182,6 +190,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		// Fetch serer snapshot and compare against local
 		let serverSnapshot = await state.$fetch();
 		expect(serverSnapshot).to.deep.equal(state);
+
+		await state.$destroy();
 	});
 
 	it.skip('dueling updates', async function() {
@@ -206,6 +216,11 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			console.log('B VALUE', b);
 			expect(a).to.deep.equal(b);
 		}
+
+		await Promise.all([
+			a.$destroy(),
+			b.$destroy(),
+		]);
 	});
 
 	it('deeply nested state read/write change detection + sync', async function () {
@@ -254,6 +269,8 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 					delete struct[key];
 				});
 		}
+
+		await state.$destroy();
 	});
 
 });
