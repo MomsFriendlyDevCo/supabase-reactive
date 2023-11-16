@@ -61,30 +61,30 @@ This can take an optional shorthand path and/or an options structure.
 
 Valid options are:
 
-| Option                        | Type                   | Default       | Description                                                                                                                                     |
-|-------------------------------|------------------------|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `supbase`                     | `Supabase`             |               | Supabase instance to use                                                                                                                        |
-| `table`                       | `String`               |               | Supabase table to store data within if `path` is not specified                                                                                  |
-| `id`                          | `String`               |               | ID of the table row to sync data with                                                                                                           |
-| `isArray=false`               | `Boolean`              | `false`       | Specifies if the data entity is an Array rather than an object                                                                                  |
-| `read=true`                   | `Boolean`              | `true`        | Allow reading from the remote Supabase server, disabling this makes the data transfer transmit only                                             |
-| `watch=true`                  | `Boolean`              | `true`        | Allow watching for local changes and write them to the remote server if enabled                                                                 |
-| `write=true`                  | `Boolean`              | `true`        | Allow writing back local changes to the Supabase server                                                                                         |
-| `attachReactives=true`        | `Boolean`              | `true`        | Expose all utility functions as '$' prefixed functions to control the local state                                                               |
-| `throttle`                    | `Object`               |               | Lodash debounce options + `wait` key used to throttle all writes, set to falsy to disable                                                       |
-| `idColumn='id'`               | `String`               | `'id'`        | Row ID column to sync with                                                                                                                      |
-| `filter`                      | `Object`               |               | Query filter to use when accessing multiple rows                                                                                                |
-| `dataColumn='data'`           | `String`               | `'data'`      | Data / JSONB column to sync data with                                                                                                           |
-| `timestampColumn='edited_at'` | `String`               | `'edited_at'` | Timezone+TZ column to use when syncing data                                                                                                     |
-| `versionColumn`               | `String`               |               | Optional version column, this increments on each write and is only really useful for debugging purposes                                         |
-| `reactiveCreate`              | `Function`             |               | Async function used to create an observable / reactive data entity from its input. Defaults to Vue's reactive function                          |
-| `reactiveWatch`               | `Function`             |               | Async function used to create a watch on the created reactive. Defaults to Vue's watch function                                                 |
-| `onInit`                      | `Function`             |               | Async function when first populating data from the remote. Called as `(data:Object                                                              | Array)` |
-| `onRead`                      | `Function`             |               | Async function called on subsequent reads when populating data from the remote. Called as `(data:Object                                         | Array)` |
-| `onChange`                    | `Function`             |               | Async function called when a detected local write is about to be sent to the remote. Called as `(dataPayload:Object                             | Array)` |
-| `onDestroy`                   | `Function`             |               | Async function called when destroying state. Called as `(data:Reactive)`                                                                        |
-| `debug`                       | `Function` / `Boolean` |               | Optional debugging function callback. Called as `(...msg:Any)`                                                                                  |
-| `splitPath`                   | `Function`             |               | Path parser, expected to decorate the `settings` object. Called as `(path: String, settings: Object)` and expected to mutate the settings state |
+| Option            | Type                   | Default       | Description                                                                                                                                     |
+|-------------------|------------------------|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `supbase`         | `Supabase`             |               | Supabase instance to use                                                                                                                        |
+| `table`           | `String`               |               | Supabase table to store data within if `path` is not specified                                                                                  |
+| `id`              | `String`               |               | ID of the table row to sync data with                                                                                                           |
+| `isArray`         | `Boolean`              | `false`       | Specifies if the data entity is an Array rather than an object                                                                                  |
+| `read=true`       | `Boolean`              | `true`        | Allow reading from the remote Supabase server, disabling this makes the data transfer transmit only                                             |
+| `watch=true`      | `Boolean`              | `true`        | Allow watching for local changes and write them to the remote server if enabled                                                                 |
+| `write=true`      | `Boolean`              | `true`        | Allow writing back local changes to the Supabase server                                                                                         |
+| `attachReactives` | `Boolean`              | `true`        | Expose all utility functions as '$' prefixed functions to control the local state                                                               |
+| `throttle`        | `Object`               |               | Lodash debounce options + `wait` key used to throttle all writes, set to falsy to disable                                                       |
+| `idColumn='id'`   | `String`               | `'id'`        | Row ID column to sync with                                                                                                                      |
+| `filter`          | `Object`               |               | Query filter to use when accessing multiple rows                                                                                                |
+| `dataColumn`      | `String`               | `'data'`      | Data / JSONB column to sync data with                                                                                                           |
+| `timestampColumn` | `String`               | `'edited_at'` | Timezone+TZ column to use when syncing data                                                                                                     |
+| `versionColumn`   | `String`               |               | Optional version column, this increments on each write and is only really useful for debugging purposes                                         |
+| `reactiveCreate`  | `Function`             |               | Async function used to create an observable / reactive data entity from its input. Defaults to Vue's reactive function                          |
+| `reactiveWatch`   | `Function`             |               | Async function used to create a watch on the created reactive. Defaults to Vue's watch function                                                 |
+| `onInit`          | `Function`             |               | Async function when first populating data from the remote. Called as `(data)`                                                                   |
+| `onRead`          | `Function`             |               | Async function called on subsequent reads when populating data from the remote. Called as `(data)`                                              |
+| `onChange`        | `Function`             |               | Async function called when a detected local write is about to be sent to the remote. Called as `(dataPayload)`                                  |
+| `onDestroy`       | `Function`             |               | Async function called when destroying state. Called as `(data:Reactive)`                                                                        |
+| `debug`           | `Function` / `Boolean` |               | Optional debugging function callback. Called as `(...msg:Any)`                                                                                  |
+| `splitPath`       | `Function`             |               | Path parser, expected to decorate the `settings` object. Called as `(path: String, settings: Object)` and expected to mutate the settings state |
 
 
 defaults
