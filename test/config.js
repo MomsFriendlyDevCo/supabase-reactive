@@ -6,8 +6,8 @@ import mlog from 'mocha-logger';
 * @type {Object}
 */
 let config = {
-	supabaseUrl: 'https://ijnqntoireecgbqmlpka.supabase.co',
-	supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbnFudG9pcmVlY2dicW1scGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0NDMyNzksImV4cCI6MjAwNjAxOTI3OX0.xacVcYUsyWw3rYybDDln1oDs9xB4LQqv7xDK-8xuyLU',
+	supabaseUrl: 'FIXME:Your Supabase URL',
+	supabaseKey: 'FIXME:Your Supabase key',
 	supabaseOptions: {
 		realtime: {
 			// transport: window.WebSocket, // FIXME: Fix for https://github.com/supabase/realtime-js/issues/219#issuecomment-1387158074
@@ -97,6 +97,10 @@ export async function reset() {
 			},
 			{
 				[config.idColumn]: '11111111-1111-1111-1111-111111111111',
+				[config.versionColumn]: 0,
+			},
+			{
+				[config.idColumn]: '22222222-2222-2222-2222-222222222222',
 				[config.versionColumn]: 0,
 			},
 		])
