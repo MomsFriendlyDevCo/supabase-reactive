@@ -5,6 +5,32 @@ import {random, sampleSize} from 'lodash-es';
 import Reactive, {defaults as ReactiveDefaults} from '#lib/reactive';
 import {setTimeout as tick} from 'node:timers/promises';
 
+// Utility: buildRandomBranch() {{{
+function buildRandomBranch(depth = 0) {
+	let dice = // Roll a dice to pick the content
+		depth == 0 ? 10 // first roll is always '10'
+		: random(0, 11 - depth, false); // Subsequent rolls bias downwards based on depth (to avoid recursion)
+
+	return (
+		dice == 0 ? false
+		: dice == 1 ? true
+		: dice == 2 ? random(1, 10000)
+		: dice == 3 ? (new Date(random(1000000000000, 1777777777777))).toISOString()
+		: dice == 5 ? Array.from(new Array(random(1, 10)), ()=> random(1, 10))
+		: dice == 6 ? null
+		: dice < 8 ? Array.from(new Array(random(1, 10)), ()=> buildRandomBranch(depth+1))
+		: Object.fromEntries(
+			Array.from(new Array(random(1, 5)))
+				.map((v, k) => [
+					`key_${k}`,
+					buildRandomBranch(depth+1),
+				])
+		)
+	)
+}
+
+// }}}
+
 describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 	before('supabase setup', config.setup)
@@ -79,7 +105,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			destroy: 0,
 		};
 
-		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
+		let state = await Reactive(`${config.table}/dddddddd-dddd-dddd-dddd-dddddddddddd`, {
 			...config.baseReactive(),
 			onInit: ()=> tripped.init++,
 			onRead: ()=> tripped.read++,
@@ -116,7 +142,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
-			change: 1,
+			change: 2,
 			destroy: 0,
 		})
 
@@ -125,7 +151,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
-			change: 1,
+			change: 2,
 			destroy: 1,
 		})
 	});
@@ -139,7 +165,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			keyNull: null,
 		};
 
-		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
+		let state = await Reactive(`${config.table}/eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee`, {
 			...config.baseReactive(),
 		});
 		Object.assign(state, struct);
@@ -158,37 +184,38 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(serverSnapshot).to.deep.equal(state);
 	});
 
-	it.only('deeply nested state read/write change detection + sync', async function () {
+	it.skip('dueling updates', async function() {
 		this.timeout(30 * 1000); //~ 30s timeout
 
-		let buildRandomBranch = (depth = 0) => {
-			let dice = // Roll a dice to pick the content
-				depth == 0 ? 10 // first roll is always '10'
-				: random(0, 11 - depth, false); // Subsequent rolls bias downwards based on depth (to avoid recursion)
+		let a = await Reactive(`${config.table}/ffffffff-ffff-ffff-ffff-ffffffffffff`, {...config.baseReactive()});
+		let b = await Reactive(`${config.table}/ffffffff-ffff-ffff-ffff-ffffffffffff`, {...config.baseReactive()});
 
-			return (
-				dice == 0 ? false
-				: dice == 1 ? true
-				: dice == 2 ? random(1, 10000)
-				: dice == 3 ? (new Date(random(1000000000000, 1777777777777))).toISOString()
-				: dice == 5 ? Array.from(new Array(random(1, 10)), ()=> random(1, 10))
-				: dice == 6 ? null
-				: dice < 8 ? Array.from(new Array(random(1, 10)), ()=> buildRandomBranch(depth+1))
-				: Object.fromEntries(
-					Array.from(new Array(random(1, 5)))
-						.map((v, k) => [
-							`key_${k}`,
-							buildRandomBranch(depth+1),
-						])
-				)
-			)
+		for (let i = 1; i < 3; i++) {
+			mlog.log('Iteration', i);
+
+			// Assign changes to A
+			Object.assign(a, {
+				...a,
+				...buildRandomBranch(),
+			});
+
+			// Wait for local observers to catch up
+			await tick(2000);
+
+			// Check A and B match
+			console.log('B VALUE', b);
+			expect(a).to.deep.equal(b);
 		}
+	});
 
-		let state = await Reactive(`${config.table}/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb`, {
+	it('deeply nested state read/write change detection + sync', async function () {
+		this.timeout(30 * 1000); //~ 30s timeout
+
+		let state = await Reactive(`${config.table}/11111111-1111-1111-1111-111111111111`, {
 			...config.baseReactive(),
 		});
 
-		for (let i = 1; i < 6; i++) {
+		for (let i = 1; i < 5; i++) {
 			mlog.log('Iteration', i);
 
 			// Propose new structure

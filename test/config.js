@@ -62,7 +62,7 @@ export async function reset() {
 		.neq('id', '00000000-0000-0000-0000-000000000000') // Have to pass in a filter which will never match to keep Supabase happy when calling .delete()
 
 	// Create some dummy data
-	await config.supabase
+	let {error} = await config.supabase
 		.from(config.table)
 		.insert([
 			{
@@ -83,8 +83,26 @@ export async function reset() {
 					existingArray: [1, 2, {three: 3}],
 				}
 			},
+			{
+				[config.idColumn]: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+				[config.versionColumn]: 0,
+			},
+			{
+				[config.idColumn]: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
+				[config.versionColumn]: 0,
+			},
+			{
+				[config.idColumn]: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+				[config.versionColumn]: 0,
+			},
+			{
+				[config.idColumn]: '11111111-1111-1111-1111-111111111111',
+				[config.versionColumn]: 0,
+			},
 		])
 		.select('id')
+
+	if (error) throw error;
 }
 
 
