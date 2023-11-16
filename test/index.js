@@ -3,6 +3,7 @@ import {expect} from 'chai';
 import mlog from 'mocha-logger';
 import {random} from 'lodash-es';
 import Reactive, {defaults as ReactiveDefaults} from '#lib/reactive';
+import {setTimeout as tick} from 'node:timers/promises';
 
 describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
@@ -129,7 +130,35 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		})
 	});
 
-	it.only('deeply nested state read/write change detection + sync', async function () {
+	it.only('sync various data types', async ()=> {
+		let struct = {
+			keyDate: new Date(),
+			keyNumber: 123,
+			keyBoolean: true,
+			keyArray: [1, 2, false],
+			keyNull: null,
+		};
+
+		let state = await Reactive(`${config.table}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
+			...config.baseReactive(),
+		});
+		Object.assign(state, struct);
+
+		// Wait for local observers to catch up
+		await tick();
+
+		// Check local state has updated against the proposed one
+		expect(state).to.be.deep.equal(struct);
+
+		// Await server flush
+		await state.$flush();
+
+		// Fetch serer snapshot and compare against local
+		let serverSnapshot = await state.$fetch();
+		expect(serverSnapshot).to.deep.equal(state);
+	});
+
+	it('deeply nested state read/write change detection + sync', async function () {
 		this.timeout(30 * 1000); //~ 30s timeout
 
 		let buildRandomBranch = (depth = 0) => {
