@@ -1,7 +1,7 @@
 import config from './config.js';
 import {expect} from 'chai';
 import mlog from 'mocha-logger';
-import {random} from 'lodash-es';
+import {random, sampleSize} from 'lodash-es';
 import Reactive, {defaults as ReactiveDefaults} from '#lib/reactive';
 import {setTimeout as tick} from 'node:timers/promises';
 
@@ -130,9 +130,9 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		})
 	});
 
-	it.only('sync various data types', async ()=> {
+	it('sync various data types', async ()=> {
 		let struct = {
-			keyDate: new Date(),
+			keyDateString: (new Date()).toISOString(), // NOTE: JSONB cannot store Data types natively
 			keyNumber: 123,
 			keyBoolean: true,
 			keyArray: [1, 2, false],
@@ -158,7 +158,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		expect(serverSnapshot).to.deep.equal(state);
 	});
 
-	it('deeply nested state read/write change detection + sync', async function () {
+	it.only('deeply nested state read/write change detection + sync', async function () {
 		this.timeout(30 * 1000); //~ 30s timeout
 
 		let buildRandomBranch = (depth = 0) => {
@@ -170,7 +170,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 				dice == 0 ? false
 				: dice == 1 ? true
 				: dice == 2 ? random(1, 10000)
-				: dice == 3 ? new Date(random(1000000000000, 1777777777777))
+				: dice == 3 ? (new Date(random(1000000000000, 1777777777777))).toISOString()
 				: dice == 5 ? Array.from(new Array(random(1, 10)), ()=> random(1, 10))
 				: dice == 6 ? null
 				: dice < 8 ? Array.from(new Array(random(1, 10)), ()=> buildRandomBranch(depth+1))
@@ -203,26 +203,29 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			// Check local state has updated against the proposed one
 			expect(state).to.be.deep.equal(struct);
 
+			// Wait for local observers to catch up
+			await tick();
+
 			// Await server flush
 			await state.$flush();
 
 			// Force-fetch server version and compare to local
 			let serverSnapshot = await state.$fetch();
+			/*
 			console.log('3Way compare', {
 				state: Object.keys(state).sort(),
 				struct: Object.keys(struct).sort(),
 				serverSnapshot: Object.keys(serverSnapshot).sort(),
 			});
-			// expect(state).to.deep.equal(serverSnapshot);
+			*/
+			expect(state).to.deep.equal(serverSnapshot);
 
 			// Randomly nuke keys
-			/*
-			Object.keys(state).slice(0, random(0, 3))
+			sampleSize(Object.keys(state), random(0, 2))
 				.forEach(key => {
 					delete state[key];
 					delete struct[key];
 				});
-			*/
 		}
 	});
 
