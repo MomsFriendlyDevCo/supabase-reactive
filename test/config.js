@@ -1,3 +1,4 @@
+import configPrivate from './config.private.js';
 import {createClient as Supabase} from '@supabase/supabase-js'
 import mlog from 'mocha-logger';
 
@@ -6,8 +7,7 @@ import mlog from 'mocha-logger';
 * @type {Object}
 */
 let config = {
-	supabaseUrl: 'FIXME:Your Supabase URL',
-	supabaseKey: 'FIXME:Your Supabase key',
+	...configPrivate,
 	supabaseOptions: {
 		realtime: {
 			// transport: window.WebSocket, // FIXME: Fix for https://github.com/supabase/realtime-js/issues/219#issuecomment-1387158074
