@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@momsfriendlydevco/eslint-config": "^1.0.9",
-    "@supabase/supabase-js": "^2.38.4",
+    "@supabase/supabase-js": "^2.43.2",
     "lodash-es": "^4.17.21",
     "vue": "^3.3.8"
   },
