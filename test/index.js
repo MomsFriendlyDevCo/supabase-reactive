@@ -36,6 +36,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 	before('supabase setup', config.setup);
 	after('supabase teardown', config.teardown);
 
+
 	it('basic state checking (purely offline)', async ()=> {
 		let state = await Reactive({
 			...config.baseReactive(),
@@ -60,6 +61,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		await state.$destroy();
 	});
 
+
 	it('access an existing row (via settings)', async ()=> {
 		let fetchedA = await Reactive({
 			...config.baseReactive(),
@@ -74,6 +76,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		await fetchedA.$destroy();
 	});
+
 
 	it('access existing rows (via path + options)', async ()=> {
 		let fetchedB = await Reactive(`${config.table}/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb`, {
@@ -91,6 +94,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		await fetchedB.$destroy();
 	});
 
+
 	it('access existing rows (via path + defaults)', async ()=> {
 		Object.assign(ReactiveDefaults, config.baseReactive());
 
@@ -105,7 +109,10 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		await fetchedC.$destroy();
 	});
 
-	it('react to lifecycle', async ()=> {
+
+	it('react to lifecycle', async function() {
+		this.timeout(30 * 1000);
+
 		let tripped = {
 			init: 0,
 			read: 0,
@@ -164,7 +171,9 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		})
 	});
 
-	it('sync various data types', async ()=> {
+
+	it('sync various data types', async function() {
+		this.timeout(30 * 1000);
 		let struct = {
 			keyDateString: (new Date()).toISOString(), // NOTE: JSONB cannot store Data types natively
 			keyNumber: 123,
@@ -194,6 +203,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		await state.$destroy();
 	});
 
+
 	it.skip('dueling updates', async function() {
 		this.timeout(30 * 1000); //~ 30s timeout
 
@@ -222,6 +232,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 			b.$destroy(),
 		]);
 	});
+
 
 	it('deeply nested state read/write change detection + sync', async function () {
 		this.timeout(30 * 1000); //~ 30s timeout
