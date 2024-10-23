@@ -32,15 +32,15 @@
     "node": ">=18.17.1"
   },
   "dependencies": {
-    "@momsfriendlydevco/eslint-config": "^1.0.9",
-    "@supabase/supabase-js": "^2.43.2",
+    "@momsfriendlydevco/eslint-config": "^2.0.5",
+    "@supabase/supabase-js": "^2.45.6",
+    "eslint": "^9.13.0",
     "lodash-es": "^4.17.21",
-    "vue": "^3.3.8"
+    "vue": "^3.5.12"
   },
   "devDependencies": {
-    "chai": "^4.3.7",
-    "eslint": "^8.28.0",
-    "mocha": "^10.1.0",
+    "chai": "^5.1.2",
+    "mocha": "^10.7.3",
     "mocha-logger": "^1.0.8"
   },
   "eslintConfig": {

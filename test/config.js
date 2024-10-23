@@ -52,7 +52,7 @@ export async function setup() {
 	config.supabase = Supabase(config.supabaseUrl, config.supabaseKey, config.supabaseOptions);
 
 	if (config.supabaseUser) {
-		let {data, error} = await config.supabase.auth.signInWithPassword({
+		let {error} = await config.supabase.auth.signInWithPassword({
 			email: config.supabaseUser,
 			password: config.supabasePass,
 		});
