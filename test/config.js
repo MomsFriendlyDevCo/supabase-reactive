@@ -119,8 +119,9 @@ export async function reset() {
 			},
 		])
 		.select('id')
+	console.log('Fetch finished', error);
 
-	if (error) throw error;
+	if (error) throw new Error(`Error while creating test scenario - ${error.message}`);
 }
 
 
