@@ -7,6 +7,11 @@ import mlog from 'mocha-logger';
 * @type {Object}
 */
 let config = {
+	supabaseUrl: 'FIXME:Url',
+	supabaseKey: 'FIXME:Url',
+	supabaseUser: null, // Set to a username if any
+	supabasePass: null,
+
 	...configPrivate,
 	supabaseOptions: {
 		realtime: {
@@ -45,6 +50,15 @@ let config = {
 */
 export async function setup() {
 	config.supabase = Supabase(config.supabaseUrl, config.supabaseKey, config.supabaseOptions);
+
+	if (config.supabaseUser) {
+		let {data, error} = await config.supabase.auth.signInWithPassword({
+			email: config.supabaseUser,
+			password: config.supabasePass,
+		});
+		if (error) throw new Error(`Failed to signin - ${error.message}`);
+	}
+
 	await reset();
 }
 
