@@ -227,7 +227,7 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 	});
 
 
-	it('deeply nested state read/write change detection + sync', async function () {
+	it('deeply nested state read/write change detection + sync', async function() {
 		this.timeout(30 * 1000); //~ 30s timeout
 
 		let state = await Reactive(`${config.table}/11111111-1111-1111-1111-111111111111`, {
@@ -273,6 +273,60 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 					delete struct[key];
 				});
 		}
+
+		await state.$destroy();
+	});
+
+	it('array operations', async function() {
+		this.timeout(30 * 1000); //~ 30s timeout
+
+		let state = await Reactive(`${config.table}/22222222-2222-2222-2222-222222222222`, {
+			...config.baseReactive(),
+		});
+		Object.assign(state, {a: []});
+
+		// Wait for local observers to catch up
+		await tick();
+
+		// Push/Unshift to array
+		state.a.push({v:2});
+		state.a.push({v:3});
+		state.a.unshift({v:1});
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: [{v:1}, {v:2}, {v:3}]});
+
+		// Truncate array
+		state.a = [];
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: []});
+
+		// Push + concat array
+		state.a.push({v:5});
+		state.a = state.a.concat([{v:6}], [{v:7}]);
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: [{v:5}, {v:6}, {v:7}]});
+
+		// Splice array
+		state.a.splice(0, 1);
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: [{v:6}, {v:7}]});
+
+		// Reverse in place
+		state.a = [1, 2, 3];
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: [1, 2, 3]});
+		state.a.reverse();
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: [3, 2, 1]});
+
+		// Sort in place
+		state.a = ['c', 'b', 'd', 'e', 'a', 'f'];
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: ['c', 'b', 'd', 'e', 'a', 'f']});
+		state.a.sort();
+		await state.$flush();
+		expect(await state.$fetch()).to.deep.equal({a: ['a', 'b', 'c', 'd', 'e', 'f']});
+
 
 		await state.$destroy();
 	});
