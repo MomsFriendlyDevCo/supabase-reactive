@@ -6,6 +6,13 @@ import Reactive, {defaults as ReactiveDefaults} from '#lib/reactive';
 import {setTimeout as tick} from 'node:timers/promises';
 
 // Utility: buildRandomBranch() {{{
+/**
+* Build a chaotic random tree structure based on dice rolls
+*
+* @param {Number} [depth=0] The current depth we are starting at, changes the nature of branches based on probability
+*
+* @returns {*} The current branch conotents
+*/
 function buildRandomBranch(depth = 0) {
 	let dice = // Roll a dice to pick the content
 		depth == 0 ? 10 // first roll is always '10'
