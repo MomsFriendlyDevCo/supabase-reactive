@@ -37,7 +37,7 @@ let config = {
 		versionColumn: config.versionColumn,
 		throttle: config.throttle,
 		debug(...msg) {
-			mlog.log(`[SUPABASE/${this.table}/${this.id}]`, ...msg);
+			mlog.log(`[SUPABASE/${this.table}/${this.id}]`, ...msg.map(m => JSON.stringify(m)));
 		},
 	}},
 }
@@ -119,7 +119,6 @@ export async function reset() {
 			},
 		])
 		.select('id')
-	console.log('Fetch finished', error);
 
 	if (error) throw new Error(`Error while creating test scenario - ${error.message}`);
 }
