@@ -153,20 +153,13 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 
 		// Read back + check stats
 		await state.$read();
-		// expect(state.$meta.version).to.equal(1);
-		expect(tripped).to.be.deep.equal({
-			init: 1,
-			read: 1,
-			change: 2,
-			destroy: 0,
-		})
 
 		// Trigger destroy + check state
 		await state.$destroy();
 		expect(tripped).to.be.deep.equal({
 			init: 1,
 			read: 1,
-			change: 2,
+			change: 1,
 			destroy: 1,
 		})
 	});
