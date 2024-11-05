@@ -338,4 +338,33 @@ describe('@MomsFriendlyDevCo/Supabase-Reactive', ()=> {
 		await state.$destroy();
 	});
 
+	it('agressive writes', async function() {
+		this.timeout(30 * 1000);
+
+		let state = await Reactive(`${config.tabl3}/33333333-3333-3333-3333-333333333333`, {
+			...config.baseReactive(),
+		});
+
+		let expectValue;
+		await new Promise(resolve => {
+			let doWrite = cycle => {
+				mlog.log('Cycle', cycle);
+				state.k = expectValue = 'v' + cycle + '-' + random(1000000, 9999999);
+				setTimeout(()=> cycle >= 100 ? resolve() : doWrite(cycle+1), 0);
+			};
+			doWrite(0);
+		})
+
+		// Wait for local observers to catch up
+		await tick();
+
+		// Await server flush
+		await state.$flush();
+
+		// Check local state has updated against the proposed one
+		expect(state.k).to.be.deep.equal(expectValue);
+
+		await state.$destroy();
+	});
+
 });
